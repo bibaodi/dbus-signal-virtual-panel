@@ -33,7 +33,7 @@ class BackEnd : public QObject {
 
 public:
   explicit BackEnd(QObject *parent = nullptr);
-
+  ~BackEnd();
   QString userName();
   void setUserName(const QString &userName);
 

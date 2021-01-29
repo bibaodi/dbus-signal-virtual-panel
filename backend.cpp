@@ -7,6 +7,8 @@ BackEnd::BackEnd(QObject *parent) : QObject(parent) {
   qDebug() << "finish create BackEnd and EvFilter";
 }
 
+BackEnd::~BackEnd() { delete evfilter; }
+
 QString BackEnd::userName() { return m_userName; }
 
 void BackEnd::setUserName(const QString &userName) {
