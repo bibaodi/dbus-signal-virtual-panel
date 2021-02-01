@@ -1,4 +1,5 @@
 #include "backend.h"
+#include <X11/XKBlib.h>
 
 BackEnd::BackEnd(QObject *parent) : QObject(parent) {
   qDebug() << "init BackEnd Instance";
@@ -62,7 +63,15 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
     void *display = native->nativeResourceForScreen(
         QByteArray("display"), QGuiApplication::primaryScreen());
     xdisplay = reinterpret_cast<Display *>(display);
-    KeySym keysym = XKeycodeToKeysym(xdisplay, keycode, 0);
+    /*p0=disp;p1=keycode;p2=index
+     * KeySym keysym = XKeycodeToKeysym(xdisplay, keycode,0);
+     *XkeycodeToKeysym is deprecated
+     */
+    /* which declares:
+         KeySym XkbKeycodeToKeysym(Display *dpy, KeyCode kc,
+                                   unsigned int group, unsigned int level); */
+    KeySym keysym =
+        XkbKeycodeToKeysym(xdisplay, keycode, 0, keystate & ShiftMask ? 1 : 0);
     qDebug() << "keysym:" << XKeysymToString(keysym) << "(" << keysym << ")";
     be_p->setKeySym(XKeysymToString(keysym));
     // emit notify_keysym(keysym);

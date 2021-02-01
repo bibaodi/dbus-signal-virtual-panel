@@ -43,7 +43,8 @@ ApplicationWindow {
         }
         onKeySymChanged: {
             var original = this.color
-            console.log("onkeysym-changed", keySym, ks)
+            console.log("onkeysym-changed",
+                        ks) /*ks is the parameter from emit function*/
             knob_press.color = '#ff0000'
             label.text = keySym
         }
