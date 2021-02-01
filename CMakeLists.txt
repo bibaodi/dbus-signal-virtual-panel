@@ -40,6 +40,8 @@ include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 find_package(Qt5 COMPONENTS Core Quick REQUIRED Widgets)
 #for glog
 find_package (glog 0.4.0 REQUIRED)
+#for gtest
+find_package(GTest CONFIG REQUIRED)
 #for x11
 find_package(X11)
 
