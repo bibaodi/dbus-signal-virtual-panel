@@ -11,7 +11,7 @@ ApplicationWindow {
 
     Item {
         Timer {
-            interval: 500
+            interval: 150
             running: true
             repeat: true
             onTriggered: {
@@ -30,7 +30,7 @@ ApplicationWindow {
     BackEnd {
         id: backend
         onUserNameChanged: {
-            console.log("log:", userName)
+            console.log("userName is:", userName)
             if ("abc" == userName) {
                 txt.color = 'red'
             }
@@ -70,15 +70,13 @@ ApplicationWindow {
             anchors.fill: parent
             onClicked: {
                 /*this make event emit to self and property changed based on self value*/
-                console.log("console.log::::")
-                console.log(parent.color)
-                console.log('red')
+                console.log("parent.color is:", parent.color)
                 if ('#ff0000' != parent.color) {
-                    console.log("red")
+                    console.log("currnt color is !red")
                     parent.color = 'red'
                     return 'red'
                 } else {
-                    console.log("yellow")
+                    console.log("current color is !yellow")
                     parent.color = 'yellow'
                     return 'yellow'
                 }
@@ -94,7 +92,6 @@ ApplicationWindow {
                 label.x = newX
                 label.y = newY
             }
-
             text: "KnobPress"
         }
     }

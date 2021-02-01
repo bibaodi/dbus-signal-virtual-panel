@@ -1,11 +1,11 @@
 #include "backend.h"
 #include <X11/XKBlib.h>
+#include <glog/logging.h>
 
 BackEnd::BackEnd(QObject *parent) : QObject(parent) {
-  qDebug() << "init BackEnd Instance";
-  // MyXcbEventFilter tmp(43, this);
+  DLOG(INFO) << "init BackEnd Instance";
   evfilter = new MyXcbEventFilter(43, this);
-  qDebug() << "finish create BackEnd and EvFilter";
+  DLOG(INFO) << "finish create BackEnd and EvFilter";
 }
 
 BackEnd::~BackEnd() { delete evfilter; }
@@ -29,14 +29,14 @@ void BackEnd::setKeySym(const QString ks) {
 
 MyXcbEventFilter::MyXcbEventFilter(int a, void *p)
     : be_p(static_cast<BackEnd *>(p)) {
-  qDebug() << "starting EventFilter, a=" << a;
+  DLOG(INFO) << "starting EventFilter, a=" << a;
   QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
-  qDebug() << "finish install native event filter;";
+  DLOG(INFO) << "finish install native event filter;";
 }
 
 bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
                                          void *message, long *result) {
-  //--begin
+
   Q_UNUSED(result);
 
   xcb_key_press_event_t *kev = nullptr;
@@ -57,7 +57,7 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
       keystate |= Mod4Mask;
     if (kev->state & XCB_MOD_MASK_SHIFT)
       keystate |= ShiftMask;
-    qDebug() << "KeyCode:" << keycode << ";keystate:" << keystate;
+    DLOG(INFO) << "KeyCode:" << keycode << ";keystate:" << keystate;
     Display *xdisplay;
     QPlatformNativeInterface *native = qApp->platformNativeInterface();
     void *display = native->nativeResourceForScreen(
@@ -69,13 +69,13 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
      */
     /* which declares:
          KeySym XkbKeycodeToKeysym(Display *dpy, KeyCode kc,
-                                   unsigned int group, unsigned int level); */
+                                   unsigned int group, unsigned int level);
+    */
     KeySym keysym =
         XkbKeycodeToKeysym(xdisplay, keycode, 0, keystate & ShiftMask ? 1 : 0);
-    qDebug() << "keysym:" << XKeysymToString(keysym) << "(" << keysym << ")";
+    DLOG(INFO) << "keysym:" << XKeysymToString(keysym) << "(" << keysym << ")";
     be_p->setKeySym(XKeysymToString(keysym));
-    // emit notify_keysym(keysym);
   }
-  //--end
+
   return false;
 }

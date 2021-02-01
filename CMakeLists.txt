@@ -43,19 +43,10 @@ find_package (glog 0.4.0 REQUIRED)
 #for x11
 find_package(X11)
 
-if(ANDROID)
-    add_library(qt-quick-cpp4qml SHARED
+add_executable(qt-quick-cpp4qml
       main.cpp
       qml.qrc
-    )
-else()
-    add_executable(qt-quick-cpp4qml
-      main.cpp
-      qml.qrc
-      backend.cpp
-      #event_filter.cpp
-    )
-endif()
+      backend.cpp)
 
 target_compile_definitions(qt-quick-cpp4qml
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
