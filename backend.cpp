@@ -1,6 +1,7 @@
 #include "backend.h"
 #include <X11/XKBlib.h>
 #include <glog/logging.h>
+#include <string>
 
 BackEnd::BackEnd(QObject *parent) : QObject(parent) {
   DLOG(INFO) << "init BackEnd Instance";
@@ -22,9 +23,10 @@ void BackEnd::setUserName(const QString &userName) {
 
 const QString BackEnd::keySym() const { return m_keysym; }
 
-void BackEnd::setKeySym(const QString ks) {
-  m_keysym = ks;
-  emit keySymChanged(ks);
+void BackEnd::setKeySym(const QString &p_keysym) {
+  /*为了简单方便，这里使用字符串，后续要改为int，然后判断函数在cpp中实现，导入到qml中，决定哪一个button被激活*/
+  m_keysym = p_keysym;
+  emit keySymChanged(p_keysym);
 }
 
 MyXcbEventFilter::MyXcbEventFilter(int a, void *p)
@@ -46,18 +48,29 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
       kev = static_cast<xcb_key_press_event_t *>(message);
   }
 
+  QString key_modifier;
   if (kev != nullptr) {
     unsigned int keycode = kev->detail;
     unsigned int keystate = 0;
-    if (kev->state & XCB_MOD_MASK_1)
+    if (kev->state & XCB_MOD_MASK_1) {
       keystate |= Mod1Mask;
-    if (kev->state & XCB_MOD_MASK_CONTROL)
+      key_modifier += "alt;";
+    }
+    if (kev->state & XCB_MOD_MASK_CONTROL) {
       keystate |= ControlMask;
-    if (kev->state & XCB_MOD_MASK_4)
+      key_modifier += "ctrl;";
+    }
+    if (kev->state & XCB_MOD_MASK_4) {
       keystate |= Mod4Mask;
-    if (kev->state & XCB_MOD_MASK_SHIFT)
+      key_modifier += "mod4;";
+    }
+    if (kev->state & XCB_MOD_MASK_SHIFT) {
       keystate |= ShiftMask;
-    DLOG(INFO) << "KeyCode:" << keycode << ";keystate:" << keystate;
+      key_modifier += "shift;";
+    }
+    DLOG(INFO) << "KeyCode:" << keycode
+               << ";keystate:" << key_modifier.toStdString();
+
     Display *xdisplay;
     QPlatformNativeInterface *native = qApp->platformNativeInterface();
     void *display = native->nativeResourceForScreen(
@@ -73,8 +86,21 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
     */
     KeySym keysym =
         XkbKeycodeToKeysym(xdisplay, keycode, 0, keystate & ShiftMask ? 1 : 0);
-    DLOG(INFO) << "keysym:" << XKeysymToString(keysym) << "(" << keysym << ")";
-    be_p->setKeySym(XKeysymToString(keysym));
+    QString s_keysym(XKeysymToString(keysym));
+    DLOG(INFO) << "keysym:" << s_keysym.toStdString() << "(" << keysym << ")";
+    QString combine_keystring = key_modifier + "+" + s_keysym;
+    int idx_comma = combine_keystring.indexOf(';');
+    if (idx_comma > 0) {
+      DLOG(INFO) << "combine" << combine_keystring.left(idx_comma).toStdString()
+                 << idx_comma;
+    } else {
+      int n = combine_keystring.indexOf('+');
+      int len = combine_keystring.length();
+      DLOG(INFO) << "no-modifier"
+                 << combine_keystring.right(len - n - 1).toStdString() << len
+                 << n;
+    }
+    be_p->setKeySym(combine_keystring);
   }
 
   return false;

@@ -38,7 +38,7 @@ public:
   void setUserName(const QString &userName);
 
   const QString keySym() const;
-  void setKeySym(const QString ks);
+  void setKeySym(const QString &ks);
 
 signals:
   void userNameChanged();

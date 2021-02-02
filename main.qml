@@ -5,8 +5,8 @@ import EsiModule 1.0
 
 ApplicationWindow {
     id: root
-    width: 300
-    height: 480
+    width: 480
+    height: 300
     visible: true
 
     Item {
@@ -16,12 +16,11 @@ ApplicationWindow {
             repeat: true
             onTriggered: {
                 time.text = Date().toString()
-                if (knob_press.color == '#ff0000') {
-                    knob_press.color = "#ffff00"
+                if (knob_press_main.color == '#ff0000') {
+                    knob_press_main.color = "#ffff00"
                 }
             }
         }
-
         Text {
             id: time
         }
@@ -45,7 +44,7 @@ ApplicationWindow {
             var original = this.color
             console.log("onkeysym-changed",
                         ks) /*ks is the parameter from emit function*/
-            knob_press.color = '#ff0000'
+            knob_press_main.color = '#ff0000'
             label.text = keySym
         }
     }
@@ -59,7 +58,7 @@ ApplicationWindow {
         onEditingFinished: backend.userName = text
     }
     Rectangle {
-        id: knob_press
+        id: knob_press_main
         x: 20
         y: 30
         width: 190
@@ -93,6 +92,51 @@ ApplicationWindow {
                 label.y = newY
             }
             text: "KnobPress"
+        }
+    }
+
+    KnobKey {
+        id: knob_key_01
+        x: 200
+        y: 200
+        Timer {
+            id: timer
+        }
+        BackEnd {
+            id: backend_knob_key_01
+            function delay(delayTime, cb) {
+                console.log("delay function: param1=", delayTime)
+                timer.interval = delayTime
+                timer.repeat = false
+                timer.triggered.connect(cb)
+                timer.start()
+            }
+            onKeySymChanged: {
+
+                var original = "#2eaf39" //knob_key_01.children[0].color
+                console.log("onkeysym-changed",
+                            ks) /*ks is the parameter from emit function*/
+                var int_m = ks.indexOf('ctrl')
+
+                var key_index = -1
+                if (int_m >= 0) {
+                    if (ks.indexOf('a') > 0) {
+                        key_index = 0
+                    } else if (ks.indexOf('d') > 0) {
+                        key_index = 1
+                    } else if (ks.indexOf('s') > 0) {
+                        key_index = 2
+                    }
+                }
+                if (key_index < 0) {
+                    return
+                }
+                knob_key_01.children[key_index].color = '#ff0000'
+                delay(100, function () {
+                    knob_key_01.children[key_index].color = original
+                    console.log("call back function: color=", original)
+                })
+            }
         }
     }
 }
