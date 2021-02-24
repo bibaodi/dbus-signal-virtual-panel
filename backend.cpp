@@ -88,6 +88,12 @@ bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
         XkbKeycodeToKeysym(xdisplay, keycode, 0, keystate & ShiftMask ? 1 : 0);
     QString s_keysym(XKeysymToString(keysym));
     DLOG(INFO) << "keysym:" << s_keysym.toStdString() << "(" << keysym << ")";
+    LOG(INFO) << "TEST-init BackEnd Instance" << s_keysym.toStdString();
+    LOG(WARNING) << "TEST-init BackEnd Instance" << s_keysym.toStdString();
+    LOG(ERROR) << "TEST-init BackEnd Instance" << s_keysym.toStdString();
+    /*LOG(FATAL) << "TEST-init BackEnd Instance" << s_keysym.toStdString();
+     *this will end the process, be carefule to use it.
+     * */
     QString combine_keystring = key_modifier + "+" + s_keysym;
     int idx_comma = combine_keystring.indexOf(';');
     if (idx_comma > 0) {

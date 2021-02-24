@@ -120,11 +120,11 @@ ApplicationWindow {
 
                 var key_index = -1
                 if (int_m >= 0) {
-                    if (ks.indexOf('a') > 0) {
+                    if (ks.indexOf('F2') > 0) {
                         key_index = 0
-                    } else if (ks.indexOf('d') > 0) {
+                    } else if (ks.indexOf('F3') > 0) {
                         key_index = 1
-                    } else if (ks.indexOf('s') > 0) {
+                    } else if (ks.indexOf('F4') > 0) {
                         key_index = 2
                     }
                 }
