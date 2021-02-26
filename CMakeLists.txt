@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(qt-quick-cpp4qml LANGUAGES CXX)
+project(virtualCtrlPanel LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -34,23 +34,30 @@ set(X11_LIB_SEARCH_PATH
 #            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
 #    endif()
 #endif()
-find_package(Qt5Gui)
-include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
-find_package(Qt5 COMPONENTS Core Quick REQUIRED Widgets)
+#find_package(Qt5Gui)
+find_package(Qt5 COMPONENTS Core Quick Widgets Gui Qml REQUIRED)
+include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 #for glog
 find_package (glog 0.4.0 REQUIRED)
 #for gtest
 find_package(GTest CONFIG REQUIRED)
 #for x11
 find_package(X11)
+#for global shortcuts
+find_package(qxtglobalshortcut REQUIRED)
 
-add_executable(qt-quick-cpp4qml
+set(exe virtual_panel.exe)
+
+add_executable(${exe}
       main.cpp
       qml.qrc
       backend.cpp)
 
-target_compile_definitions(qt-quick-cpp4qml
+target_compile_definitions(${exe}
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-target_link_libraries(qt-quick-cpp4qml
-  PRIVATE Qt5::Core Qt5::Quick glog::glog ${X11_LIBRARIES})
+target_link_libraries(${exe}
+  PRIVATE Qt5::Core Qt5::Quick glog::glog ${X11_LIBRARIES} qxtglobalshortcut)
+#below command can only appear once!!!
+#target_link_libraries(${exe} qxtglobalshortcut)
+#target_link_libraries(${exe} Qt5::Widgets)

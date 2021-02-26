@@ -3,6 +3,7 @@ import QtQml 2.3
 import QtQuick.Controls 2.0
 import EsiModule 1.0
 
+
 ApplicationWindow {
     id: root
     width: 480
@@ -139,4 +140,20 @@ ApplicationWindow {
             }
         }
     }
+    //Column {
+        Repeater {
+            id: knob_key_01s
+            model: ["R1", "R2", "R3", "R4"]
+            KnobKey {
+                x: (index % 4) * width
+                y: Math.floor(index / 4 + 1) * height
+                text: modelData
+                color: pressed ? "#d6d6d6" : "#eeeeee"
+                onClicked: console.log(eventName, "id:", this.id)
+                property string eventName: {
+                    return "button_" + text
+                }
+            }
+        }
+    //}
 }
