@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>KnobKey.qml</file>
         <file>PanelButton.qml</file>
+        <file>KeyReader.qml</file>
     </qresource>
 </RCC>

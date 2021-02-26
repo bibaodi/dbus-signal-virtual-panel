@@ -1,12 +1,12 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include <qqml.h>
-
 #include <QObject>
 #include <QQuickItem>
 #include <QSharedDataPointer>
 #include <QString>
+#include <qqml.h>
+#include <qxtglobalshortcut.h>
 
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
@@ -43,11 +43,14 @@ public:
 signals:
   void userNameChanged();
   void keySymChanged(const QString ks);
+  void globalShotcut(const QString gskeys);
+public slots:
+  void slot_receive(QxtGlobalShortcut *);
 
 private:
   QString m_userName;
   QString m_keysym;
-  MyXcbEventFilter *evfilter;
+  // MyXcbEventFilter *evfilter;
 };
 
 class MyXcbEventFilter : public QAbstractNativeEventFilter {

@@ -9,18 +9,34 @@
 #include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QVector>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <glog/logging.h>
 #include <qpa/qplatformnativeinterface.h>
 #include <xcb/xcb.h>
 
-#include <QVector>
+int init_glog(char *argv[]) {
+  QString glog_file_name("google-glog:");
+  const char *slash = strrchr(argv[0], '/');
+  const char *argv0 = slash ? slash + 1 : argv[0];
+  glog_file_name.append(argv0);
+  DLOG(INFO) << "glog name:" << glog_file_name.toStdString();
+  QByteArray br_glog_file_name = glog_file_name.toUtf8();
+  google::InitGoogleLogging(br_glog_file_name);
+  LOG(WARNING) << "Glog TEST- finish init glog Instance";
+  DLOG(WARNING) << "Glog TEST- finish init glog Instance";
+  FLAGS_max_log_size = 1;
+  DLOG(INFO) << "Google Debug logging export class to qml finished";
+  return 0;
+}
 
 int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  init_glog(argv);
 
+  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QGuiApplication app(argc, argv);
+
   /*register class defined in cpp to qml, just class no instace*/
   qmlRegisterType<BackEnd>("EsiModule", 1, 0, "BackEnd");
 
@@ -34,25 +50,13 @@ int main(int argc, char *argv[]) {
       },
       Qt::QueuedConnection);
   engine.load(url);
-  /*#for cpp map to qml*/
-  qmlRegisterType<BackEnd>("EsiModule", 1, 0, "ScreenAdapter");
-  QString glog_file_name("google-glog:");
-  const char *slash = strrchr(argv[0], '/');
-  const char *argv0 = slash ? slash + 1 : argv[0];
-  glog_file_name.append(argv0);
-  DLOG(INFO) << "glog name:" << glog_file_name.toStdString();
-  QByteArray br_glog_file_name = glog_file_name.toUtf8();
-  google::InitGoogleLogging(br_glog_file_name);
-  LOG(WARNING) << "Glog TEST- finish init glog Instance";
-  DLOG(WARNING) << "Glog TEST- finish init glog Instance";
-  FLAGS_max_log_size = 1;
-  DLOG(INFO) << "Google Debug logging export class to qml finished";
+
   /*grab-key.begin*/
   QTextStream out(stdout);
   QTextStream err(stderr);
 
   const QKeySequence shortcut("alt+y");
-  const QKeySequence shortcut2("ctrl+shift+f3");
+  const QKeySequence shortcut2("alt+t");
   const QxtGlobalShortcut globalShortcut(shortcut);
   const QxtGlobalShortcut globalShortcut2(shortcut2);
 
@@ -67,13 +71,16 @@ int main(int argc, char *argv[]) {
              .arg(shortcut.toString(), shortcut2.toString())
       << Qt::endl;
 
-  QObject::connect(
-      &globalShortcut, &QxtGlobalShortcut::activated, &globalShortcut,
-      [&] { out << QLatin1String("Shortcut pressed!") << Qt::endl; });
+  BackEnd *backend = new BackEnd();
+  QObject::connect(&globalShortcut2, &QxtGlobalShortcut::activated,
+                   &globalShortcut2, [&] {
+                     out << shortcut2.toString() << Qt::endl;
+                     backend->setKeySym(shortcut2.toString());
+                   });
 
-  QObject::connect(
-      &globalShortcut2, &QxtGlobalShortcut::activated, &globalShortcut2,
-      [&] { out << QLatin1String("Shortcut2 pressed!") << Qt::endl; });
+  QObject::connect(&globalShortcut, SIGNAL(activated(QxtGlobalShortcut *)),
+                   backend, SLOT(slot_receive(QxtGlobalShortcut *)));
+
   DLOG(INFO) << "finish create grab key";
   /*grab-key.end*/
 

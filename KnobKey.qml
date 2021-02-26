@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.5
+import EsiModule 1.0
 
 Rectangle {
     id: knobKey
@@ -10,17 +11,26 @@ Rectangle {
     property bool pressed: mouse.pressed
     border.color: "white"
     color: 'gray'
+    BackEnd {
+        id: backend
+        property alias text: keyname.text
+        onKeySymChanged: {
+            console.log("PanelButton:onkeysym-changed:param=",
+                        ks, ";key.text=", text) /*ks is the parameter from emit function*/
+        }
+        onGlobalShotcut: {
+            console.log("qml-side Backend: onGlobalShotcut, msg=", gskeys)
+        }
+    }
     Text {
         id: keyname
         anchors.fill: parent
-        //text: qsTr("B-Mode")
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         height: parent.textHeight
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        //font.pixelSize: height * fontHeight
         color: "#1b1c1d"
         font.family: "Open Sans Regular"
     }
@@ -59,5 +69,10 @@ Rectangle {
         id: mouse
         anchors.fill: parent
         onClicked: knobKey.clicked()
+    }
+    function emitByshortcut(shortcut: string): string {
+        console.log("Got msg shortcut:", shortcut)
+        KnobKey.clicked()
+        return Shortcut
     }
 }
