@@ -44,7 +44,7 @@ find_package (glog 0.4.0 REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 #for x11
 find_package(X11)
-#for global shortcuts
+#for global key_shortcuts
 find_package(qxtglobalshortcut REQUIRED)
 
 set(exe virtual_panel.exe)

@@ -45,7 +45,7 @@ signals:
   void keySymChanged(const QString ks);
   void globalShotcut(const QString gskeys);
 public slots:
-  void slot_receive(QxtGlobalShortcut *);
+  void slot_receive(QString *);
 
 private:
   QString m_userName;

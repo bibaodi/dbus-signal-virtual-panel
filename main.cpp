@@ -51,38 +51,34 @@ int main(int argc, char *argv[]) {
       Qt::QueuedConnection);
   engine.load(url);
 
-  /*grab-key.begin*/
+  /*grab-key.begin
   QTextStream out(stdout);
   QTextStream err(stderr);
 
   const QKeySequence shortcut("alt+y");
-  const QKeySequence shortcut2("alt+t");
-  const QxtGlobalShortcut globalShortcut(shortcut);
-  const QxtGlobalShortcut globalShortcut2(shortcut2);
+  const QKeySequence shortcut2("meta+t");
+  QList<QKeySequence> shortcuts;
+  shortcuts << shortcut << shortcut2;
+  const QxtGlobalShortcut globalShortcut(shortcuts);
 
-  if (!globalShortcut.isValid() || !globalShortcut2.isValid()) {
+  if (!globalShortcut.isValid()) {
     err << QString("Error: Failed to set shortcut %1 || %2")
                .arg(shortcut.toString(), shortcut2.toString())
-        << Qt::endl;
+        << endl;
     return 1;
   }
 
   out << QString("Press shortcut %1 ||%2 (or CTRL+C to exit)")
              .arg(shortcut.toString(), shortcut2.toString())
-      << Qt::endl;
-
-  BackEnd *backend = new BackEnd();
-  QObject::connect(&globalShortcut2, &QxtGlobalShortcut::activated,
-                   &globalShortcut2, [&] {
-                     out << shortcut2.toString() << Qt::endl;
-                     backend->setKeySym(shortcut2.toString());
+      << endl;
+  QObject::connect(&globalShortcut, &QxtGlobalShortcut::activated,
+                   &globalShortcut, [&](QString activated_keys) {
+                     out << activated_keys << endl;
+                     // backend->setKeySym(activated_keys);
                    });
 
-  QObject::connect(&globalShortcut, SIGNAL(activated(QxtGlobalShortcut *)),
-                   backend, SLOT(slot_receive(QxtGlobalShortcut *)));
-
   DLOG(INFO) << "finish create grab key";
-  /*grab-key.end*/
+  grab-key.end*/
 
   return app.exec();
 }

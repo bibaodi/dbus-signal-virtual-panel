@@ -9,102 +9,56 @@ ApplicationWindow {
     width: 480
     height: 300
     visible: true
+
     Rectangle {
         width: 200; height: 200
+        Keys.onPressed: {
+            console.log("Captured:", event.text);
+            switch (event.text) {
+                case "a":
+                    knob_key_01s.itemAt(0).clicked(1);
+                    break;
+                case "s":
+                    knob_key_01s.itemAt(1).clicked(1);
+                    break;
+                case "d":
+                    knob_key_01s.itemAt(2).clicked(1);
+                    break;
+                case "f":
+                    knob_key_01s.itemAt(3).clicked(1);
+                    break;
+                default:
+                    console.log("not bind keys")
+            }
+        }
+        Keys.onReleased: {
+            switch (event.text) {
+                case "a":
+                    knob_key_01s.itemAt(0).clicked(0);
+                    break;
+                case "s":
+                    knob_key_01s.itemAt(1).clicked(0);
+                    break;
+                case "d":
+                    knob_key_01s.itemAt(2).clicked(0);
+                    break;
+                case "f":
+                    knob_key_01s.itemAt(3).clicked(0);
+                    break;
+                default:
+                    console.log("not bind keys")
+            }
 
+        }
         Loader {
             id: loader
             focus: true
         }
-
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 loader.source = "KeyReader.qml"
             }
-        }
-
-        Keys.onPressed: {
-            console.log("Captured:",
-                        event.text);
-        }
-    }
-
-    Item {
-        Timer {
-            interval: 150
-            running: true
-            repeat: true
-            onTriggered: {
-                time.text = Date().toString()
-                if (knob_press_main.color == '#ff0000') {
-                    knob_press_main.color = "#ffff00"
-                }
-            }
-        }
-        Text {
-            id: time
-        }
-    }
-
-    BackEnd {
-        id: backend
-        onUserNameChanged: {
-            console.log("userName is:", userName)
-            if ("abc" == userName) {
-                txt.color = 'red'
-            }
-        }
-        function delay(delayTime) {
-            var timer = new Timer()
-            timer.interval = delayTime
-            timer.repeat = false
-            timer.start()
-        }
-        onKeySymChanged: {
-            var original = this.color
-            console.log("onkeysym-changed",
-                        ks) /*ks is the parameter from emit function*/
-            knob_press_main.color = '#ff0000'
-            label.text = keySym
-        }
-    }
-
-    Rectangle {
-        id: knob_press_main
-        x: 20
-        y: 30
-        width: 190
-        height: 100
-        color: "#ffff00"
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                /*this make event emit to self and property changed based on self value*/
-                console.log("parent.color is:", parent.color)
-                if ('#ff0000' != parent.color) {
-                    console.log("currnt color is !red")
-                    parent.color = 'red'
-                    return 'red'
-                } else {
-                    console.log("current color is !yellow")
-                    parent.color = 'yellow'
-                    return 'yellow'
-                }
-            }
-            onDoubleClicked: label.moveTo(mouse.x, mouse.y)
-            cursorShape: Qt.ForbiddenCursor
-        }
-        Text {
-            id: label
-            font.bold: true
-            font.pixelSize: 22
-            function moveTo(newX, newY) {
-                label.x = newX
-                label.y = newY
-            }
-            text: "KnobPress"
         }
     }
 
@@ -118,7 +72,13 @@ ApplicationWindow {
             y: Math.floor(index / 4 + 1) * height
             text: modelData
             color: pressed ? "#d6d6d6" : "#eeeeee"
-            onClicked: console.log(eventName, "id:", this.id)
+            onClicked: function (press) {
+                console.log(eventName, "objectName:", this.objectName, "press=", press);
+                if (1 === press) {
+                color = "#d6d6d6" ;} else {
+                color = "#eeeeee";}
+            }
+
             property string eventName: {
                 return objectName
             }

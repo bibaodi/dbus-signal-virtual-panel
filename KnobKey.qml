@@ -3,7 +3,7 @@ import EsiModule 1.0
 
 Rectangle {
     id: knobKey
-    signal clicked
+    signal clicked(int press)
     width: 100
     height: 100
     border.width: 1
@@ -11,17 +11,7 @@ Rectangle {
     property bool pressed: mouse.pressed
     border.color: "white"
     color: 'gray'
-    BackEnd {
-        id: backend
-        property alias text: keyname.text
-        onKeySymChanged: {
-            console.log("PanelButton:onkeysym-changed:param=",
-                        ks, ";key.text=", text) /*ks is the parameter from emit function*/
-        }
-        onGlobalShotcut: {
-            console.log("qml-side Backend: onGlobalShotcut, msg=", gskeys)
-        }
-    }
+
     Text {
         id: keyname
         anchors.fill: parent
@@ -68,11 +58,8 @@ Rectangle {
     MouseArea {
         id: mouse
         anchors.fill: parent
-        onClicked: knobKey.clicked()
-    }
-    function emitByshortcut(shortcut: string): string {
-        console.log("Got msg shortcut:", shortcut)
-        KnobKey.clicked()
-        return Shortcut
+        onClicked: function () {
+            knobKey.clicked(2);
+        }
     }
 }

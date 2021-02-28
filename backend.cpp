@@ -6,20 +6,24 @@
 BackEnd::BackEnd(QObject *parent) : QObject(parent) {
   DLOG(INFO) << "init BackEnd Instance";
   // evfilter = new MyXcbEventFilter(43, this);
+  /*
   const QKeySequence shortcut("alt+u");
-  const QxtGlobalShortcut globalShortcut(shortcut);
+  const QKeySequence shortcut2("alt+f2");
+  QList<QKeySequence> scs;
+  scs << shortcut << shortcut2;
+  const QxtGlobalShortcut *gscs = new QxtGlobalShortcut(scs);
 
-  if (!globalShortcut.isValid()) {
+  if (!gscs->isValid()) {
     DLOG(ERROR) << QString("Error: Failed to set shortcut %1")
                        .arg(shortcut.toString())
                        .toStdString();
   }
 
-  QObject::connect(&globalShortcut, &QxtGlobalShortcut::activated,
-                   &globalShortcut, [&] {
-                     DLOG(INFO) << shortcut.toString().toStdString();
-                     setKeySym(shortcut.toString());
-                   });
+  QObject::connect(gscs, &QxtGlobalShortcut::activated, gscs,
+                   [&](QString activated_keys) {
+                     DLOG(INFO) << activated_keys.toStdString();
+                     setKeySym(activated_keys);
+                   });*/
   DLOG(INFO) << "finish create BackEnd and EvFilter";
 }
 
@@ -52,9 +56,8 @@ MyXcbEventFilter::MyXcbEventFilter(int a, void *p)
   DLOG(INFO) << "finish install native event filter;";
 }
 
-void BackEnd::slot_receive(QxtGlobalShortcut *sc) {
-  DLOG(INFO) << sc->shortcut().toString().toStdString();
-  emit keySymChanged(sc->shortcut().toString());
+void BackEnd::slot_receive(QString *sc) {
+  DLOG(INFO) << "sc->shortcut().toString().toStdString():" << sc;
 }
 bool MyXcbEventFilter::nativeEventFilter(const QByteArray &eventType,
                                          void *message, long *result) {
