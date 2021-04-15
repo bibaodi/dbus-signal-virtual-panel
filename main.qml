@@ -2,9 +2,11 @@ import QtQuick 2.6
 import QtQml 2.3
 import QtQuick.Controls 2.0
 import EsiModule 1.0
+import QtQuick.Window 2.12
+import EvFilter 1.0
 
-
-ApplicationWindow {
+//ApplicationWindow {
+ Window {
     id: root
     width: 480
     height: 300
@@ -84,5 +86,6 @@ ApplicationWindow {
             }
         }
     }
+    Component.onCompleted: {  EvFilter.listenTo(root);}
     //}
 }

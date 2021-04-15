@@ -21,48 +21,57 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
+#include <QEvent>
 #include <QVector>
 class MyXcbEventFilter;
 class BackEndData;
 
 class BackEnd : public QObject {
-  Q_OBJECT
-  Q_PROPERTY(
-      QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
-  Q_PROPERTY(QString keySym READ keySym WRITE setKeySym NOTIFY keySymChanged)
+    Q_OBJECT
+    Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
+    Q_PROPERTY(QString keySym READ keySym WRITE setKeySym NOTIFY keySymChanged)
 
-public:
-  explicit BackEnd(QObject *parent = nullptr);
-  ~BackEnd();
-  QString userName();
-  void setUserName(const QString &userName);
+  public:
+    explicit BackEnd(QObject* parent = nullptr);
+    ~BackEnd();
+    QString userName();
+    void setUserName(const QString& userName);
 
-  const QString keySym() const;
-  void setKeySym(const QString &ks);
+    const QString keySym() const;
+    void setKeySym(const QString& ks);
 
-signals:
-  void userNameChanged();
-  void keySymChanged(const QString ks);
-  void globalShotcut(const QString gskeys);
-public slots:
-  void slot_receive(QString *);
+  signals:
+    void userNameChanged();
+    void keySymChanged(const QString ks);
+    void globalShotcut(const QString gskeys);
+  public slots:
+    void slot_receive(QString*);
 
-private:
-  QString m_userName;
-  QString m_keysym;
-  // MyXcbEventFilter *evfilter;
+  private:
+    QString m_userName;
+    QString m_keysym;
+    // MyXcbEventFilter *evfilter;
 };
 
 class MyXcbEventFilter : public QAbstractNativeEventFilter {
 
-public:
-  bool nativeEventFilter(const QByteArray &eventType, void *message,
-                         long *) override;
+  public:
+    bool nativeEventFilter(const QByteArray& eventType, void* message, long*) override;
 
-  MyXcbEventFilter(int a, void *p);
+    MyXcbEventFilter(int a, void* p);
 
-private:
-  BackEnd *be_p;
+  private:
+    BackEnd* be_p;
+};
+
+class ShortcutListener : public QObject {
+    Q_OBJECT
+  public:
+    ShortcutListener(QObject* parent = nullptr) : QObject(parent) {}
+
+    Q_INVOKABLE void listenTo(QObject* object);
+    bool eventFilter(QObject* object, QEvent* ev) override;
+    static ShortcutListener* get_instance();
 };
 
 #endif // BACKEND_H
