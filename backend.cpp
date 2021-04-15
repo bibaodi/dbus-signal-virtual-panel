@@ -73,7 +73,8 @@ void QsltCursorShapeArea::set_CursorShape(int cursorShape) {
     if (m_currentShape == cursorShape)
         return;
 
-    // setCursor(cursorShape);
+    setCursor(QCursor((Qt::CursorShape)cursorShape));
+    qDebug() << ">>>>>set cursor" << cursorShape;
     emit cursorShapeChanged();
     m_currentShape = cursorShape;
 }

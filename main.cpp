@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
 
     /*register class defined in cpp to qml, just class no instace*/
     qmlRegisterType<BackEnd>("EsiModule", 1, 0, "BackEnd");
+    qmlRegisterType<QsltCursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea");
     qmlRegisterSingletonInstance<ShortcutListener>("EvFilter", 1, 0, "EvFilter", ShortcutListener::get_instance());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

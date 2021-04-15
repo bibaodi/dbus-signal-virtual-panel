@@ -39,20 +39,24 @@ import EvFilter 1.0
             switch (event.text) {
                 case "a":
                     knob_key_01s.itemAt(0).clicked(0);
-                    mouse.cursorShape = Qt.ArrowCursor;
-                    console.log("enabled? =", mouse.enabled, mouse.cursorShape);
+                    console.log("enabled? =", globalMouseArea.enabled, globalMouseArea.cursorShape);
+                    cursor_change_tool.set_CursorShape(0)
                     break;
                 case "s":
                     knob_key_01s.itemAt(1).clicked(0);
-                    mouse.cursorShape =Qt.ArrowCursor;
-                    console.log("enabled? =", mouse.enabled, mouse.cursorShape);
+                    console.log("enabled? =", globalMouseArea.enabled, globalMouseArea.cursorShape);
+                    cursor_change_tool.set_CursorShape(1)
                     break;
                 case "d":
                     knob_key_01s.itemAt(2).clicked(0);
+                    cursor_change_tool.set_CursorShape(2)
                     break;
                 case "f":
                     knob_key_01s.itemAt(3).clicked(0);
+                    cursor_change_tool.set_CursorShape(6)
                     break;
+                case "o":
+                    cursor_change_tool.set_CursorShape(10);
                 default:
                     console.log("Keys.onReleased: not bind keys")
             }
@@ -117,6 +121,11 @@ import EvFilter 1.0
                 color: "red"
             }
         }
+    CursorShapeArea {
+        id:cursor_change_tool
+    anchors.fill: redMouseArea
+    cursor_Shape: Qt.OpenHandCursor
+    }
         Rectangle {
             id: greenMouseArea
             x: 50
