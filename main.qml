@@ -8,14 +8,16 @@ import EvFilter 1.0
 //ApplicationWindow {
  Window {
     id: root
+    objectName: "root-window"
     width: 480
     height: 300
     visible: true
 
     Rectangle {
+        objectName: "rect01"
         width: 200; height: 200
         Keys.onPressed: {
-            console.log("Captured:", event.text);
+            console.log("Keys.onPressed-Captured:", event.text);
             switch (event.text) {
                 case "a":
                     knob_key_01s.itemAt(0).clicked(1);
@@ -37,9 +39,13 @@ import EvFilter 1.0
             switch (event.text) {
                 case "a":
                     knob_key_01s.itemAt(0).clicked(0);
+                    mouse.cursorShape = Qt.ArrowCursor;
+                    console.log("enabled? =", mouse.enabled, mouse.cursorShape);
                     break;
                 case "s":
                     knob_key_01s.itemAt(1).clicked(0);
+                    mouse.cursorShape =Qt.ArrowCursor;
+                    console.log("enabled? =", mouse.enabled, mouse.cursorShape);
                     break;
                 case "d":
                     knob_key_01s.itemAt(2).clicked(0);
@@ -48,7 +54,7 @@ import EvFilter 1.0
                     knob_key_01s.itemAt(3).clicked(0);
                     break;
                 default:
-                    console.log("not bind keys")
+                    console.log("Keys.onReleased: not bind keys")
             }
 
         }
@@ -77,7 +83,8 @@ import EvFilter 1.0
             onClicked: function (press) {
                 console.log(eventName, "objectName:", this.objectName, "press=", press);
                 if (1 === press) {
-                color = "#d6d6d6" ;} else {
+                color = "#d6d6d6" ;
+                } else {
                 color = "#eeeeee";}
             }
 
@@ -86,6 +93,58 @@ import EvFilter 1.0
             }
         }
     }
+    MouseArea {
+        id: globalMouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: EvFilter.cursor() ? Qt.ArrowCursor: Qt.BlankCursor
+
+    }
+    MouseArea {
+            id: redMouseArea
+            width: 150
+            height: 150
+            cursorShape: containsMouse ? Qt.OpenHandCursor : Qt.ArrowCursor
+            enabled: false
+
+            readonly property bool containsMouse: {
+                var relativePos = mapFromItem(globalMouseArea, globalMouseArea.mouseX, globalMouseArea.mouseY);
+                return contains(Qt.point(relativePos.x, relativePos.y));
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "red"
+            }
+        }
+        Rectangle {
+            id: greenMouseArea
+            x: 50
+            y: 50
+            width: 150
+            height: 150
+            color: containsMouse ? "brown" : "green"
+
+            readonly property bool containsMouse: {
+                var relativePos = mapFromItem(globalMouseArea, globalMouseArea.mouseX, globalMouseArea.mouseY);
+                return contains(Qt.point(relativePos.x, relativePos.y));
+            }
+
+            Connections {
+                target: globalMouseArea
+                onPressed: {
+                    if (greenMouseArea.containsMouse) {
+                        greenMouseArea.pressed();
+                        EvFilter.set_cursor(1);
+                    } else {
+                        EvFilter.set_cursor(-1);
+                    }
+                }
+            }
+
+            signal pressed
+            onPressed: console.log("Ahoj!")
+        }
     Component.onCompleted: {  EvFilter.listenTo(root);}
     //}
 }

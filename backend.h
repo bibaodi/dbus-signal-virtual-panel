@@ -16,10 +16,10 @@
 #include <QQmlApplicationEngine>
 
 #include <qpa/qplatformnativeinterface.h>
-#include <xcb/xcb.h>
+//
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
+//#include <X11/Xlib.h>
+//#include <X11/keysym.h>
 
 #include <QEvent>
 #include <QVector>
@@ -70,8 +70,32 @@ class ShortcutListener : public QObject {
     ShortcutListener(QObject* parent = nullptr) : QObject(parent) {}
 
     Q_INVOKABLE void listenTo(QObject* object);
+    Q_INVOKABLE bool cursor();
+    Q_INVOKABLE void set_cursor(int);
     bool eventFilter(QObject* object, QEvent* ev) override;
     static ShortcutListener* get_instance();
+
+  private:
+    int m_cursor;
+};
+
+class QsltCursorShapeArea : public QQuickItem {
+    Q_OBJECT
+
+    Q_PROPERTY(int cursor_Shape READ cursor_Shape WRITE set_CursorShape NOTIFY cursorShapeChanged)
+
+  public:
+    explicit QsltCursorShapeArea(QQuickItem* parent = 0);
+
+    // Qt::CursorShape
+    int cursor_Shape() const;
+    Q_INVOKABLE void set_CursorShape(int cursorShape);
+
+  private:
+    int m_currentShape;
+
+  signals:
+    void cursorShapeChanged();
 };
 
 #endif // BACKEND_H

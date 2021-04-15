@@ -58,6 +58,7 @@ Rectangle {
     MouseArea {
         id: mouse
         anchors.fill: parent
+        cursorShape: Qt.BlankCursor
         onClicked: function () {
             knobKey.clicked(2);
         }
