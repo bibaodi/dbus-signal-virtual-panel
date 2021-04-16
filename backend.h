@@ -6,7 +6,7 @@
 #include <QSharedDataPointer>
 #include <QString>
 #include <qqml.h>
-#include <qxtglobalshortcut.h>
+//#include <qxtglobalshortcut.h>
 
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
@@ -77,25 +77,6 @@ class ShortcutListener : public QObject {
 
   private:
     int m_cursor;
-};
-
-class QsltCursorShapeArea : public QQuickItem {
-    Q_OBJECT
-
-    Q_PROPERTY(int cursor_Shape READ cursor_Shape WRITE set_CursorShape NOTIFY cursorShapeChanged)
-
-  public:
-    explicit QsltCursorShapeArea(QQuickItem* parent = 0);
-
-    // Qt::CursorShape
-    int cursor_Shape() const;
-    Q_INVOKABLE void set_CursorShape(int cursorShape);
-
-  private:
-    int m_currentShape;
-
-  signals:
-    void cursorShapeChanged();
 };
 
 #endif // BACKEND_H

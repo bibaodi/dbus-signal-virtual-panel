@@ -1,0 +1,13 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="com.esi.mouse">
+    <signal name="key_ev_sig">
+      <arg name="keyname" type="s" direction="out"/>
+      <arg name="actname" type="s" direction="out"/>
+    </signal>
+    <method name="key_ev_slot">
+      <arg name="keyname" type="s" direction="in"/>
+      <arg name="actname" type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

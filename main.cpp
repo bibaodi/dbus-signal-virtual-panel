@@ -3,18 +3,22 @@
 #include <QAbstractNativeEventFilter>
 /*qxtglobalshortcut begin*/
 #include <QTextStream>
-#include <qxtglobalshortcut.h>
+//#include <qxtglobalshortcut.h>
 /*qxtglobalshortcut--end*/
 //#include <QApplication>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QVector>
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
+//#include <X11/Xlib.h>
+//#include <X11/keysym.h>
+#include "mouse_manager.h"
 #include <glog/logging.h>
 #include <qpa/qplatformnativeinterface.h>
-#include <xcb/xcb.h>
+//#include <xcb/xcb.h>
+
+#define KBD_EV_SERVICE_NAME "com.esi.mouse"
+#define KBD_EV_OBJECT_NAME "/obj"
 
 int init_glog(char* argv[]) {
     QString glog_file_name("google-glog:");
@@ -30,16 +34,42 @@ int init_glog(char* argv[]) {
     DLOG(INFO) << "Google Debug logging export class to qml finished";
     return 0;
 }
+#include "KbdEvAdaptor.h"
+#include "KbdEvInterface.h"
+#include "kbdev.h"
+#include <QCoreApplication>
+
+int init_dbus() {
+    KbdEv ke;
+    KbdEv* p_kbdev = new KbdEv(nullptr);
+    KbdevAdaptor* p_adaptor = new KbdevAdaptor(p_kbdev);
+    QDBusConnection sess_bus = QDBusConnection::sessionBus();
+
+    if (!sess_bus.registerService(QString(KBD_EV_SERVICE_NAME))) {
+        qFatal("Could not register service!");
+        return -1;
+    }
+
+    if (!sess_bus.registerObject(KBD_EV_OBJECT_NAME, p_kbdev, QDBusConnection::ExportScriptableContents)) {
+        qFatal("Could not register Chat object!");
+        return -1;
+    }
+    com::esi::kbdev kbdiface(KBD_EV_SERVICE_NAME, KBD_EV_OBJECT_NAME, sess_bus);
+    QObject::connect(&kbdiface, SIGNAL(key_ev_sig(QString, QString)), p_kbdev, SLOT(key_ev_slot(QString, QString)));
+    return 0;
+}
 
 int main(int argc, char* argv[]) {
     init_glog(argv);
-
+    init_dbus();
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
     /*register class defined in cpp to qml, just class no instace*/
     qmlRegisterType<BackEnd>("EsiModule", 1, 0, "BackEnd");
-    qmlRegisterType<QsltCursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea");
+    qmlRegisterType<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea");
+    // qmlRegisterSingletonInstance<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea",
+    //                                                       MouseMgr_CursorShapeArea::get_instance());
     qmlRegisterSingletonInstance<ShortcutListener>("EvFilter", 1, 0, "EvFilter", ShortcutListener::get_instance());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

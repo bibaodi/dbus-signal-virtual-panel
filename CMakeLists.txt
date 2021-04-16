@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 
 project(virtualCtrlPanel LANGUAGES CXX)
 
@@ -36,28 +36,32 @@ set(X11_LIB_SEARCH_PATH
 #endif()
 
 #find_package(Qt5Gui)
-find_package(Qt5 COMPONENTS Core Quick Widgets Gui Qml REQUIRED)
+find_package(QT NAMES Qt5 COMPONENTS Core DBus REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick Gui Qml DBus REQUIRED)
 include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 #for glog
 find_package (glog 0.4.0 REQUIRED)
 #for gtest
-find_package(GTest CONFIG REQUIRED)
+#find_package(GTest CONFIG REQUIRED)
 #for x11
-find_package(X11)
+#find_package(X11)
 #for global key_shortcuts
-find_package(qxtglobalshortcut REQUIRED)
+#find_package(qxtglobalshortcut REQUIRED)
 
 set(exe virtual_panel.exe)
+aux_source_directory(. CPP_FILES)
+file (GLOB H_Files "./*.h")
+message("My H_Files: " ${H_Files})
 
 add_executable(${exe}
-      main.cpp
       qml.qrc
-      backend.cpp)
+      ${CPP_FILES}
+      ${H_Files})
 
 target_compile_definitions(${exe}
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(${exe}
-  PRIVATE Qt5::Core Qt5::Quick glog::glog ${X11_LIBRARIES} qxtglobalshortcut)
+  PRIVATE Qt5::Core Qt5::Quick glog::glog Qt5::DBus)
 #below command can only appear once!!!
 #target_link_libraries(${exe} qxtglobalshortcut)
 #target_link_libraries(${exe} Qt5::Widgets)

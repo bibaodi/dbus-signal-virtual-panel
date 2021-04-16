@@ -65,18 +65,3 @@ void ShortcutListener::set_cursor(int condition) {
 bool ShortcutListener::cursor() { return m_cursor; }
 
 //////////////////////////
-
-QsltCursorShapeArea::QsltCursorShapeArea(QQuickItem* parent) : QQuickItem(parent), m_currentShape(-1) {}
-//#include <Qt>
-#include <QCursor>
-void QsltCursorShapeArea::set_CursorShape(int cursorShape) {
-    if (m_currentShape == cursorShape)
-        return;
-
-    setCursor(QCursor((Qt::CursorShape)cursorShape));
-    qDebug() << ">>>>>set cursor" << cursorShape;
-    emit cursorShapeChanged();
-    m_currentShape = cursorShape;
-}
-
-int QsltCursorShapeArea::cursor_Shape() const { return m_currentShape; }
