@@ -4,6 +4,7 @@ import QtQuick.Controls 2.0
 import EsiModule 1.0
 import QtQuick.Window 2.12
 import EvFilter 1.0
+import Qt.example.qobjectSingleton 1.0
 
 //ApplicationWindow {
  Window {
@@ -123,8 +124,16 @@ import EvFilter 1.0
         }
     CursorShapeArea {
         id:cursor_change_tool
-    anchors.fill: redMouseArea
-    cursor_Shape: Qt.OpenHandCursor
+        objectName: "cursor_change_tool"
+        anchors.fill: redMouseArea
+        cursor_Shape: Qt.OpenHandCursor
+    }
+    Connections {
+        target: MyApi
+        function onSomePropertyChanged(newValue) {
+            console.log("Value changed", newValue);
+            cursor_change_tool.set_CursorShape(newValue);
+        }
     }
         Rectangle {
             id: greenMouseArea
@@ -137,18 +146,6 @@ import EvFilter 1.0
             readonly property bool containsMouse: {
                 var relativePos = mapFromItem(globalMouseArea, globalMouseArea.mouseX, globalMouseArea.mouseY);
                 return contains(Qt.point(relativePos.x, relativePos.y));
-            }
-
-            Connections {
-                target: globalMouseArea
-                onPressed: {
-                    if (greenMouseArea.containsMouse) {
-                        greenMouseArea.pressed();
-                        EvFilter.set_cursor(1);
-                    } else {
-                        EvFilter.set_cursor(-1);
-                    }
-                }
             }
 
             signal pressed

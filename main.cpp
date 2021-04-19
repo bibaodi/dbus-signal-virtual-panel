@@ -16,6 +16,7 @@
 #include <glog/logging.h>
 #include <qpa/qplatformnativeinterface.h>
 //#include <xcb/xcb.h>
+#include <QDBusConnection>
 
 #define KBD_EV_SERVICE_NAME "com.esi.mouse"
 #define KBD_EV_OBJECT_NAME "/obj"
@@ -73,44 +74,34 @@ int main(int argc, char* argv[]) {
     qmlRegisterSingletonInstance<ShortcutListener>("EvFilter", 1, 0, "EvFilter", ShortcutListener::get_instance());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+
+    // Second, create an instance of the object
+
+    // allocate example before the engine to ensure that it outlives it
+    QScopedPointer<SingletonTypeExample> example(new SingletonTypeExample);
+
+    // Third, register the singleton type provider with QML by calling this
+    // function in an initialization function.
+    qmlRegisterSingletonInstance("Qt.example.qobjectSingleton", 1, 0, "MyApi", example.get());
+
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,
         [url](QObject* obj, const QUrl& objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
+            else {
+                qDebug() << "set qml-obj to global var;";
+            }
         },
         Qt::QueuedConnection);
+    QDBusConnection sess = QDBusConnection::sessionBus();
+
+    // sess.connect(QString(), QString(), "org.example.chat", "message", cursor_obj, SLOT(messageSlot(QString,
+    // QString)));
+    sess.connect(QString(), QString(), "org.example.chat", "message", example.get(),
+                 SLOT(messageSlot(QString, QString)));
+
     engine.load(url);
-
-    /*grab-key.begin
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
-    const QKeySequence shortcut("alt+y");
-    const QKeySequence shortcut2("meta+t");
-    QList<QKeySequence> shortcuts;
-    shortcuts << shortcut << shortcut2;
-    const QxtGlobalShortcut globalShortcut(shortcuts);
-
-    if (!globalShortcut.isValid()) {
-      err << QString("Error: Failed to set shortcut %1 || %2")
-                 .arg(shortcut.toString(), shortcut2.toString())
-          << endl;
-      return 1;
-    }
-
-    out << QString("Press shortcut %1 ||%2 (or CTRL+C to exit)")
-               .arg(shortcut.toString(), shortcut2.toString())
-        << endl;
-    QObject::connect(&globalShortcut, &QxtGlobalShortcut::activated,
-                     &globalShortcut, [&](QString activated_keys) {
-                       out << activated_keys << endl;
-                       // backend->setKeySym(activated_keys);
-                     });
-
-    DLOG(INFO) << "finish create grab key";
-    grab-key.end*/
-
     return app.exec();
 }
 

@@ -26,5 +26,38 @@ class MouseMgr_CursorShapeArea : public QQuickItem {
 
   signals:
     void cursorShapeChanged();
+  public slots:
+    Q_SCRIPTABLE QString messageSlot(const QString&, const QString&);
 };
+
+// First, define your QObject which provides the functionality.
+class SingletonTypeExample : public QObject {
+    Q_OBJECT
+    Q_PROPERTY(int someProperty READ someProperty WRITE setSomeProperty NOTIFY somePropertyChanged)
+
+  public:
+    explicit SingletonTypeExample(QObject* parent = nullptr) : QObject(parent) {}
+
+    Q_INVOKABLE int doSomething() {
+        setSomeProperty(5);
+        return m_someProperty;
+    }
+
+    int someProperty() const { return m_someProperty; }
+    void setSomeProperty(int val) {
+        if (m_someProperty != val) {
+            m_someProperty = val;
+            emit somePropertyChanged(val);
+        }
+    }
+  public slots:
+    void messageSlot(const QString& a, const QString& b);
+
+  signals:
+    void somePropertyChanged(int newValue);
+
+  private:
+    int m_someProperty = 0;
+};
+
 #endif // MOUSE_MANAGER_H
