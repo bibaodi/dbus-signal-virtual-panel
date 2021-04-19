@@ -32,36 +32,4 @@ void BackEnd::setKeySym(const QString& p_keysym) {
 
 void BackEnd::slot_receive(QString* sc) { DLOG(INFO) << "sc->shortcut().toString().toStdString():" << sc; }
 
-ShortcutListener* ShortcutListener::get_instance() {
-    static ShortcutListener obj;
-    return &obj;
-}
-
-bool ShortcutListener::eventFilter(QObject* obj, QEvent* ev) {
-    // qDebug() << "eventfilter: obj-name=" << obj->objectName();
-    if (QEvent::MouseMove == ev->type()) {
-        QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
-        qDebug() << "mouse event move<" << mev->x() << "," << mev->y() << ">;";
-        return true;
-    }
-    return false;
-}
-
-void ShortcutListener::listenTo(QObject* object) {
-    if (object) {
-        qDebug() << "listenTo called with obj:" << object->objectName();
-        object->installEventFilter(this);
-    }
-}
-
-void ShortcutListener::set_cursor(int condition) {
-    if (condition > 0) {
-        m_cursor = true;
-    } else {
-        m_cursor = false;
-    }
-}
-
-bool ShortcutListener::cursor() { return m_cursor; }
-
 //////////////////////////

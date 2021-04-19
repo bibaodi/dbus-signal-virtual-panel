@@ -64,19 +64,4 @@ class MyXcbEventFilter : public QAbstractNativeEventFilter {
     BackEnd* be_p;
 };
 
-class ShortcutListener : public QObject {
-    Q_OBJECT
-  public:
-    ShortcutListener(QObject* parent = nullptr) : QObject(parent) {}
-
-    Q_INVOKABLE void listenTo(QObject* object);
-    Q_INVOKABLE bool cursor();
-    Q_INVOKABLE void set_cursor(int);
-    bool eventFilter(QObject* object, QEvent* ev) override;
-    static ShortcutListener* get_instance();
-
-  private:
-    int m_cursor;
-};
-
 #endif // BACKEND_H
