@@ -11,7 +11,7 @@ class Master_PW : public Master_Graphic {
   signals:
     void sig_mouse_event(QMouseEvent*);
 
-  public: // slots:
+  public slots:
     void slot_mouse_event(QMouseEvent* mev) override;
 
   private:

@@ -13,8 +13,7 @@ class Master_B : public Master_Graphic {
 
   signals:
     void sig_mouse_event(QMouseEvent*);
-    // public slots:
-  public:
+  public slots:
     void slot_mouse_event(QMouseEvent*) override;
 
   public:
