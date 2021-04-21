@@ -2,32 +2,37 @@
 #include <QDebug>
 #include <QMouseEvent>
 
-Mouse_Ctrl_Event_Filter* Mouse_Ctrl_Event_Filter::get_instance() {
-    static Mouse_Ctrl_Event_Filter obj;
+#include "master_b.h"
+#include "master_pw.h"
+
+Mouse_Mgr_Event_Filter* Mouse_Mgr_Event_Filter::get_instance() {
+    static Mouse_Mgr_Event_Filter obj;
     return &obj;
 }
 
-bool Mouse_Ctrl_Event_Filter::eventFilter(QObject* obj, QEvent* ev) {
+bool Mouse_Mgr_Event_Filter::eventFilter(QObject* obj, QEvent* ev) {
+    Q_UNUSED(obj)
     // qDebug() << "eventfilter: obj-name=" << obj->objectName();
     if (QEvent::MouseMove == ev->type()) {
         QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
-        qDebug() << "Mouse_Ctrl_Event_Filter:: mouse event move<" << mev->x() << "," << mev->y() << ">;";
-        if (m_current_obj) {
-            emit m_current_obj->sig_mouse_event(mev);
+        qDebug() << "Mouse_Mgr_Event_Filter:: mouse event move<" << mev->x() << "," << mev->y() << ">;";
+        if (m_iter != m_master_home.end()) {
+            qDebug() << "before emit signal";
+            emit m_iter->obj->sig_mouse_event(mev);
         }
         return true;
     }
     return false;
 }
 
-void Mouse_Ctrl_Event_Filter::listenTo(QObject* object) {
+void Mouse_Mgr_Event_Filter::listenTo(QObject* object) {
     if (object) {
         qDebug() << "listenTo called with obj:" << object->objectName();
         object->installEventFilter(this);
     }
 }
 
-void Mouse_Ctrl_Event_Filter::set_cursor(int condition) {
+void Mouse_Mgr_Event_Filter::set_cursor(int condition) {
     if (condition > 0) {
         m_cursor = true;
     } else {
@@ -35,14 +40,174 @@ void Mouse_Ctrl_Event_Filter::set_cursor(int condition) {
     }
 }
 
-bool Mouse_Ctrl_Event_Filter::cursor() { return m_cursor; }
+bool Mouse_Mgr_Event_Filter::cursor() { return m_cursor; }
 
-#include "master_b.h"
-int Mouse_Ctrl_Event_Filter::get_mouse_control(Master_Graphic* mg) {
-    m_current_obj = mg;
-    if (Mouse_Control_Type_graphic_B == mg->m_mouse_ctrl_category) {
-        qDebug() << "B mode obj";
-        Master_B* mb = static_cast<Master_B*>(mg);
+///
+/// \brief Mouse_Mgr_Event_Filter::is_have_same_type
+/// \param mm_ptr
+/// \return -1 if not find same type; else return the index of the first occur;
+///
+int Mouse_Mgr_Event_Filter::is_have_same_type(Mouse_Master* mm_ptr) {
+    if (m_master_home.isEmpty()) {
+        return -1;
     }
+    for (int i = 0; i < m_master_home.size(); i++) {
+        qDebug() << "size=" << m_master_home.size() << "; i=" << i;
+        if (m_master_home.at(i).obj->get_type() == mm_ptr->get_type()) {
+            qDebug() << "got same type: mmptr=" << mm_ptr->get_type()
+                     << "home's=" << m_master_home.at(i).obj->get_type() << "i=" << i;
+            return i;
+        }
+    }
+    return -1;
+}
+///
+/// \brief Mouse_Mgr_Event_Filter::get_mouse_control
+/// this function will preempt the mouse from old obj to mg,
+/// if old-obj is app then just pop else save it.
+/// \param mm_ptr
+/// \param save_option
+/// \return
+///
+
+int Mouse_Mgr_Event_Filter::get_mouse_control(Mouse_Master* mm_ptr, int save_option) {
+    // m_current_obj = get_sub_class_ptr(mm_ptr, type);
+    qDebug() << "save option is::" << save_option << "type=" << mm_ptr->get_type();
+    // 01-judge previous obj type and do something.
+    if (m_master_home.end() != m_iter) { // not the first one
+        if (m_iter->obj->is_application()) {
+            qDebug() << "application: default not save it when it lost mouse";
+            // m_master_home.removeFirst();
+            remove_master_obj_from_list(m_iter->obj);
+        } else if (m_iter->obj->get_type() < MMT_Application) {
+            qDebug() << "graphics: default will save it when it lost mouse";
+        } else {
+            qDebug() << "cursor: ignore";
+        }
+    }
+
+    int ret = -1;
+    while ((ret = is_have_same_type(mm_ptr)) >= 0) { // fool-prof measures
+        qDebug() << "remove all same type obj" << ret;
+        m_master_home.removeAt(ret);
+    }
+    // 02-change 2 current
+    Master_Info mi = {mm_ptr, save_option};
+    m_master_home.prepend(mi);
+    m_iter = m_master_home.begin();
     return 0;
+}
+
+////
+/// \brief Mouse_Mgr_Event_Filter::release_mouse_control
+/// retrive the mouse control privilege and give it to the next obj which saved in master_home, send notify to the obj
+/// which will loss mouse.
+/// \param mm_ptr: the obj which current has mouse control privilege
+/// \param release_option: reserved param
+/// \return int: 0 is success.
+///
+
+int Mouse_Mgr_Event_Filter::release_mouse_control(Mouse_Master* mm_ptr, int release_option) {
+    qDebug() << "release mouse control called: release_option=" << release_option;
+    remove_master_obj_from_list(mm_ptr);
+    make_iter_safe();
+    return 0;
+}
+
+int Mouse_Mgr_Event_Filter::remove_master_obj_from_list(Mouse_Master* mm_ptr) {
+    if (m_master_home.isEmpty()) {
+        qDebug() << "list is null return -1;";
+        return 0;
+    }
+    if (m_master_home.begin()->obj == mm_ptr) {
+        qDebug() << "remove first";
+        m_master_home.removeFirst();
+        return 1;
+
+    } else if (m_master_home.rbegin()->obj == mm_ptr) {
+        qDebug() << "remove last";
+        m_master_home.removeLast();
+        return 1;
+    } else {
+        for (int i = 0; i < m_master_home.size(); i++) {
+            qDebug() << "size=" << m_master_home.size() << "; i=" << i;
+            if (m_master_home.at(i).obj == mm_ptr) {
+                qDebug() << "got it in home and remove in middle";
+                m_master_home.removeAt(i);
+                return 1;
+            } else {
+                qDebug() << "not find obj , remove null";
+            }
+        }
+        return 0;
+    }
+}
+
+///
+/// \brief Mouse_Mgr_Event_Filter::emit_current_subclass_signal
+/// !!!must specify the sub-class otherwise base-class's signal emitted
+/// \param mev mouse event
+///
+/*
+void Mouse_Mgr_Event_Filter::emit_current_subclass_signal(QMouseEvent* mev) {
+    auto base_obj = m_current_obj;
+
+    if (MMT_SV == base_obj->get_type()) {
+        qDebug() << "PW mode obj";
+        Master_PW* obj = static_cast<Master_PW*>(base_obj);
+        emit obj->sig_mouse_event(mev);
+    } else if (MMT_Null == base_obj->get_type()) {
+        qDebug() << "B mode obj";
+        Master_B* obj = static_cast<Master_B*>(base_obj);
+        emit obj->sig_mouse_event(mev);
+    } else if (MMT_Annotation == base_obj->get_type()) {
+        qDebug() << "annotation obj";
+    } else if (MMT_BodyMark == base_obj->get_type()) {
+        qDebug() << "bodymark obj";
+    } else if (MMT_Box_Move == base_obj->get_type()) {
+        qDebug() << "box move obj";
+    } else if (MMT_Box_Size == base_obj->get_type()) {
+        qDebug() << "box size obj";
+    }
+    return;
+}*/
+
+///
+/// \brief Mouse_Mgr_Event_Filter::make_iter_safe
+/// assume list is not empty; if m_iter is not available then assign the last to it.
+void Mouse_Mgr_Event_Filter::make_iter_safe() {
+    if (m_master_home.isEmpty()) {
+        m_iter = m_master_home.end();
+        return;
+    }
+    QList<Master_Info>::Iterator tmp = m_master_home.begin();
+    for (; tmp != m_master_home.end(); tmp++) {
+        if (tmp == m_iter) {
+            return;
+        }
+    }
+    m_iter = m_master_home.begin();
+    qDebug() << "after [get] begin type is:" << m_iter->obj->get_type();
+}
+
+int Mouse_Mgr_Event_Filter::switch_to_next(int direction) {
+    if (!direction) {
+        m_iter++;
+    } else {
+        m_iter--;
+    }
+    make_iter_safe();
+    // m_current_obj = m_iter->obj;
+    return 0;
+}
+
+QList<Mouse_Master_Type> Mouse_Mgr_Event_Filter::get_all_available_status() {
+    QList<Master_Info>::reverse_iterator tmp = m_master_home.rbegin();
+    QList<Mouse_Master_Type> list;
+    while (tmp != m_master_home.rend()) {
+        qDebug() << "Type:::" << tmp->obj->get_type();
+        list.append(tmp->obj->get_type());
+        tmp++;
+    }
+    return list;
 }

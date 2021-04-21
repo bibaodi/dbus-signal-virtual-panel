@@ -75,8 +75,8 @@ int main(int argc, char* argv[]) {
     qmlRegisterType<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea");
     // qmlRegisterSingletonInstance<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea",
     //                                                       MouseMgr_CursorShapeArea::get_instance());
-    qmlRegisterSingletonInstance<Mouse_Ctrl_Event_Filter>("EvFilter", 1, 0, "EvFilter",
-                                                          Mouse_Ctrl_Event_Filter::get_instance());
+    qmlRegisterSingletonInstance<Mouse_Mgr_Event_Filter>("EvFilter", 1, 0, "EvFilter",
+                                                         Mouse_Mgr_Event_Filter::get_instance());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
@@ -102,10 +102,6 @@ int main(int argc, char* argv[]) {
     QDBusConnection sess = QDBusConnection::sessionBus();
     sess.connect(QString(), QString(), "org.example.chat", "message", example.get(),
                  SLOT(messageSlot(QString, QString)));
-    Master_B* mb = new Master_B();
-    Mouse_Ctrl_Event_Filter::get_instance()->get_mouse_control(mb);
-    Master_PW* mpw = new Master_PW();
-    Mouse_Ctrl_Event_Filter::get_instance()->get_mouse_control(mpw);
 
     engine.load(url);
     return app.exec();

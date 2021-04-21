@@ -3,19 +3,31 @@
 #include "mouse_manager_module.h"
 
 class QMouseEvent;
-class Master_PW : public Master_Graphic {
+class Master_PW : public Mouse_Master {
     Q_OBJECT
   public:
     explicit Master_PW(QObject* parent = nullptr);
 
-  signals:
-    void sig_mouse_event(QMouseEvent*);
+  public slots:
+    void slot_mouse_event(QMouseEvent* mev) override;
+};
+
+class Master_BOX_MOVE : public Mouse_Master {
+    Q_OBJECT
+  public:
+    explicit Master_BOX_MOVE(QObject* parent = nullptr);
 
   public slots:
     void slot_mouse_event(QMouseEvent* mev) override;
+};
 
-  private:
-    const Mouse_Control_Type m_mouse_ctrl_type = Mouse_Control_Type_graphic;
+class Master_BDMK : public Mouse_Master {
+    Q_OBJECT
+  public:
+    explicit Master_BDMK(QObject* parent = nullptr);
+
+  public slots:
+    void slot_mouse_event(QMouseEvent* mev) override;
 };
 
 #endif // MASTER_PW_H
