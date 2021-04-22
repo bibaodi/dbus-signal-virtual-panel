@@ -9,7 +9,7 @@ import EvFilter 1.0
 //ApplicationWindow {
  Window {
     id: root
-    objectName: "root-window"
+    objectName: "root-42window"
     width: 480
     height: 300
     visible: true
@@ -166,6 +166,6 @@ import EvFilter 1.0
             signal pressed
             onPressed: console.log("Ahoj!")
         }
-    Component.onCompleted: {  EvFilter.listenTo(root);}
+    //Component.onCompleted: {  EvFilter.listenTo(root);}
     //}
 }

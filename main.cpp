@@ -99,11 +99,25 @@ int main(int argc, char* argv[]) {
             }
         },
         Qt::QueuedConnection);
+
     QDBusConnection sess = QDBusConnection::sessionBus();
     sess.connect(QString(), QString(), "org.example.chat", "message", Mouse_Mgr_Event_Filter::get_instance(),
                  SLOT(messageSlot(QString, QString)));
 
     engine.load(url);
+    QList<QObject*> qmlist = engine.rootObjects();
+    QObject* root_win = nullptr;
+    for (QList<QObject*>::iterator i = qmlist.begin(); i != qmlist.end(); i++) {
+        qDebug() << "objects in engine:" << (*i)->objectName();
+        if ((*i)->objectName() == "root-42window") {
+            // root_win = qobject_cast<QQuickWindow*>(*i);
+            qDebug() << "get it";
+            root_win = *i;
+        }
+    }
+    if (nullptr != root_win) {
+        Mouse_Mgr_Event_Filter().get_instance()->listenTo(root_win);
+    }
     return app.exec();
 }
 
