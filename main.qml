@@ -102,8 +102,7 @@ import EvFilter 1.0
         id: globalMouseArea
         anchors.fill: parent
         hoverEnabled: true
-        cursorShape: EvFilter.cursor() ? Qt.ArrowCursor: Qt.BlankCursor
-
+        cursorShape: EvFilter.cursor()
     }
     MouseArea {
             id: redMouseArea
@@ -125,22 +124,30 @@ import EvFilter 1.0
     CursorShapeArea {
         id:cursor_change_tool
         objectName: "cursor_change_tool"
-        anchors.fill: redMouseArea
+        anchors.fill: parent
         cursor_Shape: Qt.OpenHandCursor
     }
     /*
     Connections {
         target: MyApi
-        function onSomePropertyChanged(newValue) {
-            console.log("Value changed", newValue);
-            cursor_change_tool.set_CursorShape(newValue);
+        function onSomePropertyChanged(new_cursor_shape) {
+            console.log("Value changed", new_cursor_shape);
+            cursor_change_tool.set_CursorShape(new_cursor_shape);
         }
     }*/
     Connections {
         target: EvFilter
-        function onSomePropertyChanged(newValue) {
-            console.log("Value changed", newValue);
-            cursor_change_tool.set_CursorShape(newValue);
+        function onCursorShapeChanged(new_cursor_shape) {
+            console.log("onCursorShapeChanged:", new_cursor_shape);
+            if (new_cursor_shape < 0) {
+                var current_shape=cursor_change_tool.cursor_Shape
+                new_cursor_shape = Qt.BlankCursor
+                if(Qt.BlankCursor === current_shape) {
+                    new_cursor_shape = Qt.ArrowCursor
+                }
+            }
+            EvFilter.set_cursor(new_cursor_shape);
+            cursor_change_tool.set_CursorShape(new_cursor_shape);
         }
     }
         Rectangle {

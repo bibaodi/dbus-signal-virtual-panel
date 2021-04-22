@@ -33,7 +33,7 @@ class MouseMgr_CursorShapeArea : public QQuickItem {
 // First, define your QObject which provides the functionality.
 class SingletonTypeExample : public QObject {
     Q_OBJECT
-    Q_PROPERTY(int someProperty READ someProperty WRITE setSomeProperty NOTIFY somePropertyChanged)
+    Q_PROPERTY(int someProperty READ someProperty WRITE setSomeProperty NOTIFY cursorShapeChanged)
 
   public:
     explicit SingletonTypeExample(QObject* parent = nullptr) : QObject(parent) {}
@@ -47,14 +47,14 @@ class SingletonTypeExample : public QObject {
     void setSomeProperty(int val) {
         if (m_someProperty != val) {
             m_someProperty = val;
-            emit somePropertyChanged(val);
+            emit cursorShapeChanged(val);
         }
     }
   public slots:
     void messageSlot(const QString& a, const QString& b);
 
   signals:
-    void somePropertyChanged(int newValue);
+    void cursorShapeChanged(int new_cursor_shape);
 
   private:
     int m_someProperty = 0;

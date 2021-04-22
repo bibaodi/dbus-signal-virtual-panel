@@ -14,6 +14,7 @@ struct Master_Info {
 };
 
 enum Mouse_Master_Option { MMO_None = 100, MMO_Save = 101, MMO_Temp = 102, MMO_Notify = 103, MMO_Other = 104 };
+enum Master_Loss_Mouse_Reason { MLMR_None = 100, MLMR_Releasing, MLMR_Preempted, MLMR_Other };
 
 #include "master_b.h"
 #include "master_pw.h"
@@ -24,7 +25,7 @@ class Mouse_Mgr_Event_Filter : public QObject {
     explicit Mouse_Mgr_Event_Filter(QObject* parent = nullptr) : QObject(parent), m_iter(m_master_home.end()) {}
 
     Q_INVOKABLE void listenTo(QObject* object);
-    Q_INVOKABLE bool cursor();
+    Q_INVOKABLE int cursor();
     Q_INVOKABLE void set_cursor(int);
     bool eventFilter(QObject* object, QEvent* ev) override;
     static Mouse_Mgr_Event_Filter* get_instance();
@@ -32,9 +33,11 @@ class Mouse_Mgr_Event_Filter : public QObject {
     int get_mouse_control(Mouse_Master*, int);
     int release_mouse_control(Mouse_Master*, int);
     int switch_to_next(int direction = 0);
+    int cursor_switch();
     QList<Mouse_Master_Type> get_all_available_status();
   signals:
-    void somePropertyChanged(int newValue);
+    void cursorShapeChanged(
+        int new_cursor_shape); // if new_cursor_shape is minus zero then just switch between arrow and blank
   public slots:
     void messageSlot(const QString& a, const QString& b);
 

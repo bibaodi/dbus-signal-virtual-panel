@@ -35,6 +35,7 @@ class Mouse_Master : public QObject {
     Mouse_Master_Type m_mouse_ctrl_type = MMT_Null;
   signals:
     void sig_mouse_event(QMouseEvent*);
+    void sig_loss_mouse(int);
 
   public:
     virtual void slot_mouse_event(QMouseEvent* ev0) = 0;
