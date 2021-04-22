@@ -83,11 +83,11 @@ int main(int argc, char* argv[]) {
     // Second, create an instance of the object
 
     // allocate example before the engine to ensure that it outlives it
-    QScopedPointer<SingletonTypeExample> example(new SingletonTypeExample);
+    // QScopedPointer<SingletonTypeExample> example(new SingletonTypeExample);
 
     // Third, register the singleton type provider with QML by calling this
     // function in an initialization function.
-    qmlRegisterSingletonInstance("Qt.example.qobjectSingleton", 1, 0, "MyApi", example.get());
+    // qmlRegisterSingletonInstance("Qt.example.qobjectSingleton", 1, 0, "MyApi", example.get());
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
         },
         Qt::QueuedConnection);
     QDBusConnection sess = QDBusConnection::sessionBus();
-    sess.connect(QString(), QString(), "org.example.chat", "message", example.get(),
+    sess.connect(QString(), QString(), "org.example.chat", "message", Mouse_Mgr_Event_Filter::get_instance(),
                  SLOT(messageSlot(QString, QString)));
 
     engine.load(url);

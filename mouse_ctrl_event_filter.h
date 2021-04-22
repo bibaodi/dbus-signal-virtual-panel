@@ -33,6 +33,10 @@ class Mouse_Mgr_Event_Filter : public QObject {
     int release_mouse_control(Mouse_Master*, int);
     int switch_to_next(int direction = 0);
     QList<Mouse_Master_Type> get_all_available_status();
+  signals:
+    void somePropertyChanged(int newValue);
+  public slots:
+    void messageSlot(const QString& a, const QString& b);
 
   private:
     QList<Master_Info> m_master_home;

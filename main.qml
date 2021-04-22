@@ -4,7 +4,7 @@ import QtQuick.Controls 2.0
 import EsiModule 1.0
 import QtQuick.Window 2.12
 import EvFilter 1.0
-import Qt.example.qobjectSingleton 1.0
+//import Qt.example.qobjectSingleton 1.0
 
 //ApplicationWindow {
  Window {
@@ -128,8 +128,16 @@ import Qt.example.qobjectSingleton 1.0
         anchors.fill: redMouseArea
         cursor_Shape: Qt.OpenHandCursor
     }
+    /*
     Connections {
         target: MyApi
+        function onSomePropertyChanged(newValue) {
+            console.log("Value changed", newValue);
+            cursor_change_tool.set_CursorShape(newValue);
+        }
+    }*/
+    Connections {
+        target: EvFilter
         function onSomePropertyChanged(newValue) {
             console.log("Value changed", newValue);
             cursor_change_tool.set_CursorShape(newValue);

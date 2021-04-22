@@ -26,10 +26,10 @@ class MouseMgr_CursorShapeArea : public QQuickItem {
 
   signals:
     void cursorShapeChanged();
-  public slots:
-    Q_SCRIPTABLE QString messageSlot(const QString&, const QString&);
+    // public slots:
+    //  Q_SCRIPTABLE QString messageSlot(const QString&, const QString&);
 };
-
+/*
 // First, define your QObject which provides the functionality.
 class SingletonTypeExample : public QObject {
     Q_OBJECT
@@ -59,5 +59,5 @@ class SingletonTypeExample : public QObject {
   private:
     int m_someProperty = 0;
 };
-
+*/
 #endif // MOUSE_MANAGER_H

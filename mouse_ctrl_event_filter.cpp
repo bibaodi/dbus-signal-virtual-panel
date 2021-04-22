@@ -114,6 +114,11 @@ int Mouse_Mgr_Event_Filter::release_mouse_control(Mouse_Master* mm_ptr, int rele
     return 0;
 }
 
+///
+/// \brief Mouse_Mgr_Event_Filter::remove_master_obj_from_list
+/// \param mm_ptr
+/// \return
+///
 int Mouse_Mgr_Event_Filter::remove_master_obj_from_list(Mouse_Master* mm_ptr) {
     if (m_master_home.isEmpty()) {
         qDebug() << "list is null return -1;";
@@ -191,10 +196,24 @@ void Mouse_Mgr_Event_Filter::make_iter_safe() {
 }
 
 int Mouse_Mgr_Event_Filter::switch_to_next(int direction) {
+
+    if (MMT_Null == m_iter->obj->get_type()) {
+        // todo: does current is cursor then hide it
+        qDebug() << "hide cursor";
+    }
     if (!direction) {
         m_iter++;
     } else {
         m_iter--;
+    }
+    if (m_master_home.end() == m_iter) {
+        m_iter = m_master_home.begin();
+    } else if (m_master_home.begin() - 1 == m_iter) {
+        m_iter = m_master_home.end() - 1;
+    }
+    if (MMT_Null == m_iter->obj->get_type()) {
+        // todo: equal to cursor show
+        qDebug() << "show cursor";
     }
     make_iter_safe();
     // m_current_obj = m_iter->obj;
@@ -210,4 +229,47 @@ QList<Mouse_Master_Type> Mouse_Mgr_Event_Filter::get_all_available_status() {
         tmp++;
     }
     return list;
+}
+
+#include "master_b.h"
+#include "master_pw.h"
+#include "mouse_ctrl_event_filter.h"
+Master_B* global_mb = new Master_B();
+Master_PW* global_mpw = new Master_PW();
+Master_BDMK* global_bdmk = new Master_BDMK();
+Master_BOX_MOVE* global_box_move = new Master_BOX_MOVE();
+
+void Mouse_Mgr_Event_Filter::messageSlot(const QString& a, const QString& b) {
+    qDebug() << "Mouse_Mgr_Event_Filter message slot:: a=" << a << "; b=" << b;
+    emit somePropertyChanged(b.toInt());
+    if (a == "get") {
+        qDebug() << "inter mode-get branch";
+        if (b == QString("b")) {
+            get_mouse_control(global_mb, 1001);
+        } else if (b == QString("pw")) {
+            get_mouse_control(global_mpw, 1002);
+        } else if (b == "bdmk") {
+            get_mouse_control(global_bdmk, 2002);
+        } else if (b == "boxm") {
+            get_mouse_control(global_box_move, 1003);
+        } else if (b == "all") {
+            get_all_available_status();
+        } else if (b == "s0") {
+            switch_to_next(0);
+        } else if (b == "s1") {
+            switch_to_next(1);
+        }
+    } else if (a == "release") {
+        qDebug() << "inter mode-release branch";
+        if (b == QString("b")) {
+            release_mouse_control(global_mb, 1001);
+        } else if (b == QString("pw")) {
+            release_mouse_control(global_mpw, 1002);
+        } else if (b == "bdmk") {
+            release_mouse_control(global_bdmk, 2002);
+        } else if (b == "boxm") {
+            release_mouse_control(global_box_move, 1003);
+        }
+    }
+    return;
 }
