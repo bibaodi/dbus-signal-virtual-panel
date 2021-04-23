@@ -98,12 +98,14 @@ import EvFilter 1.0
             }
         }
     }
+    /*
     MouseArea {
-        id: globalMouseArea
+        //id: cursor_change_tool
+        id:globalMouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: EvFilter.cursor()
-    }
+    }*/
     MouseArea {
             id: redMouseArea
             width: 150
@@ -122,23 +124,14 @@ import EvFilter 1.0
             }
         }
     CursorShapeArea {
-        id:cursor_change_tool
-        objectName: "cursor_change_tool"
+        id: cursor_change_tool
         anchors.fill: parent
-        cursor_Shape: Qt.OpenHandCursor
     }
-    /*
-    Connections {
-        target: MyApi
-        function onSomePropertyChanged(new_cursor_shape) {
-            console.log("Value changed", new_cursor_shape);
-            cursor_change_tool.set_CursorShape(new_cursor_shape);
-        }
-    }*/
+
     Connections {
         target: EvFilter
         function onCursorShapeChanged(new_cursor_shape) {
-            console.log("onCursorShapeChanged:", new_cursor_shape);
+            console.log("onCursorShapeChanged: param=", new_cursor_shape, "old=", cursor_change_tool.cursor_Shape);
             if (new_cursor_shape < 0) {
                 var current_shape=cursor_change_tool.cursor_Shape
                 new_cursor_shape = Qt.BlankCursor

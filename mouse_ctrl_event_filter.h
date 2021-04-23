@@ -50,7 +50,7 @@ class Mouse_Mgr_Event_Filter : public QObject {
     int is_have_same_type(Mouse_Master*);
     void make_iter_safe();
     //
-    int m_cursor;
+    int m_cursor = 10;
     // Mouse_Master* m_current_obj = nullptr;
 };
 #endif // MOUSE_CTRL_EVENT_FILTER_H
