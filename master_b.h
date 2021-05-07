@@ -3,10 +3,10 @@
 
 //#include <QObject>
 
-#include "mouse_manager_module.h"
+#include "mouse_mgr_interface.h"
 
 class QMouseEvent;
-class Master_B : public Mouse_Master {
+class Master_B : public Mouse_Mgr_Interface {
     Q_OBJECT
   public:
     explicit Master_B(QObject* parent = nullptr);

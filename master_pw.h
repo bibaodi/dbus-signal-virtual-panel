@@ -1,9 +1,9 @@
 #ifndef MASTER_PW_H
 #define MASTER_PW_H
-#include "mouse_manager_module.h"
+#include "mouse_mgr_interface.h"
 
 class QMouseEvent;
-class Master_PW : public Mouse_Master {
+class Master_PW : public Mouse_Mgr_Interface {
     Q_OBJECT
   public:
     explicit Master_PW(QObject* parent = nullptr);
@@ -12,7 +12,7 @@ class Master_PW : public Mouse_Master {
     void slot_mouse_event(QMouseEvent* mev) override;
 };
 
-class Master_BOX_MOVE : public Mouse_Master {
+class Master_BOX_MOVE : public Mouse_Mgr_Interface {
     Q_OBJECT
   public:
     explicit Master_BOX_MOVE(QObject* parent = nullptr);
@@ -21,7 +21,7 @@ class Master_BOX_MOVE : public Mouse_Master {
     void slot_mouse_event(QMouseEvent* mev) override;
 };
 
-class Master_BDMK : public Mouse_Master {
+class Master_BDMK : public Mouse_Mgr_Interface {
     Q_OBJECT
   public:
     explicit Master_BDMK(QObject* parent = nullptr);
