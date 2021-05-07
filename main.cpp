@@ -25,10 +25,10 @@
 #define KBD_EV_SERVICE_NAME "com.esi.mouse"
 #define KBD_EV_OBJECT_NAME "/obj"
 
-int init_glog(char* argv[]) {
+int init_glog(char *argv[]) {
     QString glog_file_name("google-glog:");
-    const char* slash = strrchr(argv[0], '/');
-    const char* argv0 = slash ? slash + 1 : argv[0];
+    const char *slash = strrchr(argv[0], '/');
+    const char *argv0 = slash ? slash + 1 : argv[0];
     glog_file_name.append(argv0);
     DLOG(INFO) << "glog name:" << glog_file_name.toStdString();
     QByteArray br_glog_file_name = glog_file_name.toUtf8();
@@ -46,8 +46,8 @@ int init_glog(char* argv[]) {
 
 int init_dbus() {
     KbdEv ke;
-    KbdEv* p_kbdev = new KbdEv(nullptr);
-    KbdevAdaptor* p_adaptor = new KbdevAdaptor(p_kbdev);
+    KbdEv *p_kbdev = new KbdEv(nullptr);
+    KbdevAdaptor *p_adaptor = new KbdevAdaptor(p_kbdev);
     QDBusConnection sess_bus = QDBusConnection::sessionBus();
 
     if (!sess_bus.registerService(QString(KBD_EV_SERVICE_NAME))) {
@@ -64,7 +64,7 @@ int init_dbus() {
     return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     init_glog(argv);
     init_dbus();
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -75,8 +75,7 @@ int main(int argc, char* argv[]) {
     qmlRegisterType<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea");
     // qmlRegisterSingletonInstance<MouseMgr_CursorShapeArea>("EsiModule", 1, 0, "CursorShapeArea",
     //                                                       MouseMgr_CursorShapeArea::get_instance());
-    qmlRegisterSingletonInstance<Mouse_Mgr_Event_Filter>("EvFilter", 1, 0, "EvFilter",
-                                                         Mouse_Mgr_Event_Filter::get_instance());
+    qmlRegisterSingletonInstance<Mouse_Mgr_Main>("EvFilter", 1, 0, "EvFilter", Mouse_Mgr_Main::get_instance());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
 
@@ -91,7 +90,7 @@ int main(int argc, char* argv[]) {
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreated, &app,
-        [url](QObject* obj, const QUrl& objUrl) {
+        [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
             else {
@@ -101,13 +100,13 @@ int main(int argc, char* argv[]) {
         Qt::QueuedConnection);
 
     QDBusConnection sess = QDBusConnection::sessionBus();
-    sess.connect(QString(), QString(), "org.example.chat", "message", Mouse_Mgr_Event_Filter::get_instance(),
+    sess.connect(QString(), QString(), "org.example.chat", "message", Mouse_Mgr_Main::get_instance(),
                  SLOT(messageSlot(QString, QString)));
 
     engine.load(url);
-    QList<QObject*> qmlist = engine.rootObjects();
-    QObject* root_win = nullptr;
-    for (QList<QObject*>::iterator i = qmlist.begin(); i != qmlist.end(); i++) {
+    QList<QObject *> qmlist = engine.rootObjects();
+    QObject *root_win = nullptr;
+    for (QList<QObject *>::iterator i = qmlist.begin(); i != qmlist.end(); i++) {
         qDebug() << "objects in engine:" << (*i)->objectName();
         if ((*i)->objectName() == "root-42window") {
             // root_win = qobject_cast<QQuickWindow*>(*i);
@@ -116,7 +115,7 @@ int main(int argc, char* argv[]) {
         }
     }
     if (nullptr != root_win) {
-        Mouse_Mgr_Event_Filter().get_instance()->listenTo(root_win);
+        Mouse_Mgr_Main().get_instance()->listenTo(root_win);
     }
     return app.exec();
 }

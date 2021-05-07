@@ -19,10 +19,10 @@ enum Mouse_Master_Type {
 };
 class QMouseEvent;
 
-class Mouse_Master : public QObject {
+class Mouse_Mgr_Interface : public QObject {
     Q_OBJECT
   public:
-    explicit Mouse_Master(QObject* parent = nullptr) : QObject(parent) {}
+    explicit Mouse_Mgr_Interface(QObject *parent = nullptr) : QObject(parent) {}
     Mouse_Master_Type get_type();
     bool is_application() {
         if (m_mouse_ctrl_type > MMT_Application && m_mouse_ctrl_type < MMT_Cursor)
@@ -34,10 +34,10 @@ class Mouse_Master : public QObject {
   protected:
     Mouse_Master_Type m_mouse_ctrl_type = MMT_Null;
   signals:
-    void sig_mouse_event(QMouseEvent*);
+    void sig_mouse_event(QMouseEvent *);
     void sig_loss_mouse(int);
 
   public:
-    virtual void slot_mouse_event(QMouseEvent* ev0) = 0;
+    virtual void slot_mouse_event(QMouseEvent *ev0) = 0;
 };
 #endif // MOUSE_MANAGER_MODULE_H
