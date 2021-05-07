@@ -10,8 +10,8 @@ import EvFilter 1.0
  Window {
     id: root
     objectName: "root-42window"
-    width: 480
-    height: 300
+    width: 480*2
+    height: 300*2
     visible: true
 
     Rectangle {
@@ -98,31 +98,8 @@ import EvFilter 1.0
             }
         }
     }
-    /*
-    MouseArea {
-        //id: cursor_change_tool
-        id:globalMouseArea
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: EvFilter.cursor()
-    }*/
-    MouseArea {
-            id: redMouseArea
-            width: 150
-            height: 150
-            cursorShape: containsMouse ? Qt.OpenHandCursor : Qt.ArrowCursor
-            enabled: false
 
-            readonly property bool containsMouse: {
-                var relativePos = mapFromItem(globalMouseArea, globalMouseArea.mouseX, globalMouseArea.mouseY);
-                return contains(Qt.point(relativePos.x, relativePos.y));
-            }
 
-            Rectangle {
-                anchors.fill: parent
-                color: "red"
-            }
-        }
     CursorShapeArea {
         id: cursor_change_tool
         anchors.fill: parent
@@ -143,22 +120,12 @@ import EvFilter 1.0
             cursor_change_tool.set_CursorShape(new_cursor_shape);
         }
     }
-        Rectangle {
-            id: greenMouseArea
-            x: 50
-            y: 50
-            width: 150
-            height: 150
-            color: containsMouse ? "brown" : "green"
 
-            readonly property bool containsMouse: {
-                var relativePos = mapFromItem(globalMouseArea, globalMouseArea.mouseX, globalMouseArea.mouseY);
-                return contains(Qt.point(relativePos.x, relativePos.y));
-            }
-
-            signal pressed
-            onPressed: console.log("Ahoj!")
-        }
-    //Component.onCompleted: {  EvFilter.listenTo(root);}
-    //}
+    ROI_Shape {
+        id: aPieChart
+        anchors.centerIn: parent
+        width: 100; height: 100
+        name: "A simple pie chart"
+        color: "green"
+    }
 }

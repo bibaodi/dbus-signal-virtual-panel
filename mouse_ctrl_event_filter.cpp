@@ -19,10 +19,16 @@ bool Mouse_Mgr_Main::eventFilter(QObject* obj, QEvent* ev) {
         QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
         // qDebug() << "Mouse_Mgr_Main:: mouse event move<" << mev->x() << "," << mev->y() << ">;";
         if (m_iter != m_master_home.end()) {
-            qDebug() << "before emit signal";
+            qDebug() << "before emit mouse signal";
             emit m_iter->obj->sig_mouse_event(mev);
         }
         return true;
+    } else if (QEvent::Wheel == ev->type()) {
+        QWheelEvent* wev = static_cast<QWheelEvent*>(ev);
+        if (m_iter != m_master_home.end()) {
+            qDebug() << "before emit wheel signal";
+            emit m_iter->obj->sig_wheel_event(wev);
+        }
     }
     return false;
 }
